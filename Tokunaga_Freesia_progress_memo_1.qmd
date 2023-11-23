@@ -25,37 +25,153 @@ from: markdown+emoji
 :::
 
 ## Data source
+  The Japanese healthcare facility data was obtained from [this website](https://data.humdata.org/dataset/japan-healthsites). The dataset is part of the **Global Healthsites Mapping Project**, an initiative to make health facility data in every country accessible to anyone across the globe. More about the project can be read [here](https://healthsites.io/). 
 
-I will be using 3 datasets from gapminder, which contain information about the government health spending as a percentage of the total government spending, government health spending per person in US dollars, the out of pocket share of total health spending across the world, and the infant mortality rate per 1000 births^[https://www.gapminder.org/data/, FREE DATA FROM WORLD BANK VIA GAPMINDER.ORG, CC-BY LICENSE]
-
+  The estimate of the percentage of elderly populations (those over 65 years old) in each Japanese city was obtained from [this website](https://www.ipss.go.jp/pp-shicyoson/j/shicyoson08/t-page.asp). This data was published by the **National Institute of Population and Social Security Research of Japan** in 2008. It must be noted that this data was only available in Japanese, so I had to translate the name of each city to English, and then create a new dataset with the English name and then I selected 2020 as the year of interest. It should also be noted that the percentage of elderly population of 2020 is an **estimate**. They estimated this number **based on data from 2005**. Unfortunately, I was unable to find any observed data of the elderly population from 2020 which was divided up by city, which is why I used this dataset.
+  
+  Finally, the geographical data of Japan was obtained via the `getData` function in the `raster` package by specifying the dataset to be `GADM`. Then, I added in the `country = JPN` argument to specify geographic data from Japan. Finally, I set the `level` to 2 to obtain the boundaries for all of the cities and towns in Japan so that they are reflected onto the map. I then transformed the data so that it can be read in through `geom_sf` and be visualized.
+  
 ## Why this data
-I chose this data because as a global health major, I am very interested in how governmental financial invenstment into healthcare and financial barriers affect health outcomes for the population. More specifically, I hope to investigate the correlation between infant mortality rate and government health spending, as well as the out-of-pocket healthcare share. Many expecting mothers are unable to seek maternal care throughout their pregnancy due to health costs, resulting in complications during birth or offspring that are unable to survive due to complications that could have been foreseen if the mother could have accessed screening services. Therefore, my initial general hypothesis is that the smaller the government spending and the larger the out of pocket share of healthcare cost, the higher the infant mortality rate.
+  As a global health major, I have always been interested in the distribution and accessibility of healthcare facilities. There are countless ways to quantify the accessibility of healthcare facilities, but for this project, I decided to focus on its geographical accessibility in my home country, Japan. Japan is a rapidly aging country with nearly 30% of its population aged 65 years old and above, the highest percentage in the world. However, the elderly population is distributed unequally across Japan, with a much higher number in rural regions. Despite the elderly population needing the most healthcare services, an increasingly major concern is that facilities are not as readily available in rural areas. Therefore, the aim of my project is to compare the number of healthcare facilities available in each city in Japan to the percentage of citizens over 65 years old in that city, as well as the type of healthcare facility available (pharmacy, physician's office, hospital, etc). Through visualizing this data, the disparities, if any, of healthcare facilities across Japan will become apparent, and could become a starting point to understanding which cities need more of what kind of health facility.
+
+## Packages
+```{r echo = FALSE}
+library(tidyverse)
+library(skimr)
+library(dplyr)
+library(sf)
+library(rnaturalearth)
+library(maps)
+library(readxl)
+library(janitor)
+library(stringr)
+library(sp)
+library(raster)
+library(broom)
+library(stringi)
+```
 
 ## Data quality & complexity check
-```{r}
-library(readr)
-library(tidyverse)
-library(naniar)
+```{r echo = FALSE}
+#all healthcare sites in Japan
+japan_healthsites <- read_csv("data/japan.csv") |> 
+  dplyr::select(X, Y, amenity)
 
-gov_spending_percent <- read_csv("data/gov_health_percent.csv")
-miss_var_summary(gov_spending_percent)
+  # #overview of variable types and missingness
+  # skimr::skim_without_charts(japan_healthsites)
 
-gov_spending_per_person <- read_csv("data/gov_spending_person.csv")
-miss_var_summary(gov_spending_per_person)
+#number of citizens over 65 years old in every city in Japan
+geriatric_population <- read_excel("data/geriatric_city.xlsx")
+janitor::clean_names(geriatric_population)  
 
-out_of_pocket_share <- read_csv("data/out_of_pocket_share.csv")
-miss_var_summary(out_of_pocket_share)
+  #drop "city" from city name 
+  gp_new <- as.data.frame(geriatric_population) |> 
+    mutate(city_name = word(city, 1)) |> 
+    dplyr::select(year_2020_percentage, city_name) 
+  
+  # skimr::skim_without_charts(gp_new)
+  
+#dataframe of japan with all cities
+jpn <- getData("GADM", country = "JPN", level = 2)
+jpn_df <- sf::st_as_sf(jpn, region = "NAME_2")
+janitor::clean_names(jpn_df) 
 
-infant_mortality_rate <- read_csv("data/infant_mortality_rate.csv")
-miss_var_summary(infant_mortality_rate)
+# skimr::skim_without_charts(jpn_df)
+
+#clean up names of Japanese cities so that all accents are removed
+jpn_df$NAME_2 <- iconv(jpn_df$NAME_2, 'utf-8', 'ascii', sub = '')
+
+#filter out all cities in the elderly population dataset that exist in 'jpn_df' and set crs
+final_gp_data <- jpn_df |>
+  left_join(gp_new, by = join_by(NAME_2 == city_name))
+  
+# skimr::skim_without_charts(final_gp_data)
+
+#prepare final_gp_data for analysis
+gp_data_sf <- final_gp_data |> 
+  filter(!is.na(year_2020_percentage))
+
+#convert healthsites into sf object
+jpn_hlthsites_sf <- japan_healthsites |> 
+  filter(!is.na(X | Y)) |> 
+  st_as_sf(
+    coords = c("X", "Y"),
+    agr = "constant",
+    crs = st_crs(gp_data_sf), 
+    stringsAsFactors = FALSE,
+    remove = TRUE
+    )
+
+#which city does each healthcare facility belong to
+joint_data <- st_join(jpn_hlthsites_sf, final_gp_data, join = st_within) |> 
+  distinct(geometry, .keep_all = TRUE) |> 
+  filter(!is.na(year_2020_percentage))
+
+healthcare_facilities_per_city <- count(as_tibble(joint_data), NAME_2) 
+
+distinct_healthcare_facilities_per_city <- count(as_tibble(joint_data), NAME_2, amenity)
+
+new_data <- left_join(final_gp_data, healthcare_facilities_per_city) |> 
+  mutate(density = as.numeric(n / year_2020_percentage))
 ```
-All the data sets have only numerical variables, except for the initial column which is the country name since each consecutive column after that represents a year.
-There are a handful of missing values for each year for each data set, but it is a small percentage.
-There are 192 observations for 17 variables in the gov spending and gov spending per person data sets, however, there are 206 observations for 217 variables for infant mortality rate.
+### Dataset 1 - Japan Healthcare Sites 
+  In this dataset, we have 56596 observations with 2 numerical and 1 categorical variable after cleaning the data and selecting for only the variables of interest. The 2 numerical variables are the longitude and latitude of the position of the healthcare facility, and the categorical variable (amenity) tells us what type of healthcare facility it is. Upon checking the missingness of the data, we see a 78% completion rate for the latitude and longitude variables, and a nearly 100% completion rate for the amenity variable. 
+  
+### Dataset 2 - Japan Geriatric Population Data
+  In this dataset, we have 1851 observations of two variables after cleaning the data. The categorical variable is the name of the city, and the numerical variable is the percentage of citizens over 65 years old living in that city. There are no missing observations.
+  
+### Dataset 3 - Japan Map Data
+  In this dataset, we have 1811 observations of 14 variables. Of them, the only ones of interest are `NAME_2`, which gives us the name of the city, and `geometry`, which gives us the multipolygon data to map the datapoints onto the map to visualize the Japanese island and the borders of every single city/town within it. `ENGTYPE_2` is also of interest, since it tells us the classification of the city. It is divided up into factor levels; `town`, `city`, `village`, or `special ward`. It would be interesting to examine the correlation between the city classification and density of healthcare facilities as well. There are no missingness issues for the variables of interest.
 
 ## Potential data issues
-Since I will be merging 4 datasets with differing number of variables (years), I will need to select only the variables(years) that the datasets have in common. I will have to use pivot_longer() to create a new column indicating the type of data the numerical value is (e.g. government health spending percentage, infant mortality rate, etc) to differenciate between the columns of each data set, since as of now, they all have the same name (the year). 
+  The first issue at hand is that we do not know whether the city/towns listed in the Japan Map dataset match those in the Japan Geriatric Population dataset. This may result in some cities having to be removed from the analysis since we cannot map the correlation onto the map if the cities don't match up. Another issue that needs to be looked into is the missingness of the Japan Healthcare Sites dataset; it must be noted in the analysis that 22% of healthcare facilities cannot be mapped due to the lack of coordinates data.
+  
+  Most of these issues can be resolved by cleaning the data, where the process is described below. 
+
+## Cleaning Data
+
+### Dataset 1 - Japan Healthcare Sites 
+  Only the `X` (latitude), `Y` (longitude), and `amenity` (healthcare facility type) variables were selected by piping the dataset into the `dplyr::select()` function.
+  
+### Dataset 2 - Japan Geriatric Population Data 
+  After translating the Japanese names into English and selecting for the estimated geriatric population percentage for the year 2020, I imported the dataset and then removed the word "city" from each observation by using the `mutate` function and then the `word` function which I used to select only the first word of each observation. Then, I selected for the city name and the percentage of citizens over 65 years old.
+  
+### Combining all 3 datasets together 
+  First, I used `left_join` to combine the geriatric population data and the map data together, which eliminated data for all cities that weren't present in the map dataset. Then, I removed all rows that contained missing values for the geriatric population percentage. Then, I converted the healthcare sites data into an sf object so that it can be visualized onto the map. Finally, I joined the healthcare sites data to the larger dataset by matching the city that the healthcare site belonged to by passing in a function that checked the given coordinates and matched them to the appropriate multipolygon object present in the maps dataset. 
+
+## EDA
+```{r}
 
 
-## Misc
-I plan to begin merging the data sets by taking the common years, and then I will begin the EDA by examining the correlation coefficient between the variables by the end of this week. 
+```
+
+
+```{r echo = FALSE}
+#all of Japan
+all_jpn <- ggplot() +
+  geom_sf(data = new_data, aes(group = NAME_2, fill = density)) +
+  theme_void() 
+```
+
+```{r}
+all_jpn
+```
+The plot above shows the distribution of healthcare facilities all over Japan
+
+```{r}
+#Kanto Region
+kanto <- ggplot() +
+  geom_sf(data = new_data, aes(group = NAME_2, fill = density)) +
+  theme_void() +
+  coord_sf(xlim = c(137, 142),
+              ylim = c(32, 37))
+
+```
+
+```{r}
+kanto
+```
+The plot above zooms into the Kanto region.
+
+## Misc 
+I learned how to map geographical data from the `GADM` dataset through watching [this YouTube video](https://www.youtube.com/watch?app=desktop&v=Qbkx3LCguyg) by **Lab Time with R & Python**. I also learned how to fill in each city with a corresponding variable and its appropriate color scale through [this tutorial](https://mattherman.info/blog/point-in-poly/) by *Matt Herman*
