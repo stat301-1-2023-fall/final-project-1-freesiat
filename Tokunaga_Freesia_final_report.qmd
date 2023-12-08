@@ -1,0 +1,48 @@
+---
+title: "Japan's has the world's #1 aging population - how well are their healthcare facilities distributed to meet their needs?"
+subtitle: |
+  | Final Report
+  | Data Science 1 with R (STAT 301-1)
+author: "Freesia Tokunaga"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    
+execute:
+  echo: false
+  warning: false
+
+from: markdown+emoji 
+---
+::: {.callout-tip icon=false}
+
+## Github Repo Link
+[https://github.com/stat301-1-2023-fall/final-project-1-freesiat.git](https://github.com/stat301-1-2023-fall/final-project-1-freesiat.git)
+
+:::
+
+# Introduction
+   As a global health major, I have always been interested in the distribution and accessibility of healthcare facilities. There are countless ways to quantify the accessibility of healthcare facilities, but for this project, I decided to focus on its geographical accessibility in my home country, Japan. Japan is a rapidly aging country with nearly 30% of its population aged 65 years old and above, the highest percentage in the world. However, the elderly population is distributed unequally across Japan, with a much higher number in rural regions. Despite the elderly population needing the most healthcare services, an increasingly major concern is that facilities are not as readily available in rural areas. Therefore, the aim of my project is to compare the number of healthcare facilities available in each city in Japan to the percentage of citizens over 65 years old in that city, as well as the type of healthcare facility available (pharmacy, physician's office, hospital, etc). Through visualizing this data, the disparities, if any, of healthcare facilities across Japan will become apparent, and could become a starting point to understanding which cities need more of what kind of health facility.
+   
+The Japanese healthcare facility data was obtained from [this website](https://data.humdata.org/dataset/japan-healthsites). The dataset is part of the **Global Healthsites Mapping Project**, an initiative to make health facility data in every country accessible to anyone across the globe. More about the project can be read [here](https://healthsites.io/). 
+
+  The estimate of the percentage of elderly populations (those over 65 years old) in each Japanese city was obtained from [this website](https://www.ipss.go.jp/pp-shicyoson/j/shicyoson08/t-page.asp). This data was published by the **National Institute of Population and Social Security Research of Japan** in 2008. It must be noted that this data was only available in Japanese, so I had to translate the name of each city to English, and then create a new dataset with the English name and then I selected 2020 as the year of interest. It should also be noted that the percentage of elderly population of 2020 is an **estimate**. They estimated this number **based on data from 2005**. Unfortunately, I was unable to find any observed data of the elderly population from 2020 which was divided up by city, which is why I used this dataset.
+    The geriatric population by prefecture was found from [this website](https://www.e-stat.go.jp/stat-search/files?page=1&layout=datalist&toukei=00200524&tstat=000000090001&cycle=7&year=20220&month=0&tclass1=000001011679), which is from the official Japanese government. This data is based on 2022 census data, so it is a more accurate representation of the geriatric population distribution, but less precise since it is not divided by prefecture.
+  
+  Finally, the geographical data of Japan was obtained via the `getData` function in the `raster` package by specifying the dataset to be `GADM`. Then, I added in the `country = JPN` argument to specify geographic data from Japan. Finally, I set the `level` to 2 to obtain the boundaries for all of the cities and towns in Japan so that they are reflected onto the map. I then transformed the data so that it can be read in through `geom_sf` and be visualized.
+   
+
+# Data overview & quality
+
+# Explorations
+
+# Conclusion
+
+# References
+
+# Technical Information 
+
+# Extra Explorations

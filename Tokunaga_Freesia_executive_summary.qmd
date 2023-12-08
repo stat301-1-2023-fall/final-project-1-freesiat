@@ -1,0 +1,28 @@
+---
+title: "Japan's has the world's #1 aging population - how well are their healthcare facilities distributed to meet their needs?"
+subtitle: |
+  | Executive Summary
+  | Data Science 1 with R (STAT 301-1)
+author: "Freesia Tokunaga"
+date: today
+
+format:
+  html:
+    toc: true
+    embed-resources: true
+    
+execute:
+  echo: false
+  warning: false
+
+from: markdown+emoji 
+---
+
+# Purpose of Exploration
+ As a global health major, I have always been interested in the distribution and accessibility of healthcare facilities. There are countless ways to quantify the accessibility of healthcare facilities, but for this project, I decided to focus on its geographical accessibility in my home country, Japan. Japan is a rapidly aging country with nearly 30% of its population aged 65 years old and above, the highest percentage in the world. However, the elderly population is distributed unequally across Japan, with a much higher number in rural regions. Despite the elderly population needing the most healthcare services, an increasingly major concern is that facilities are not as readily available in rural areas. Therefore, the aim of my project is to compare the number of healthcare facilities available in each city in Japan to the percentage of citizens over 65 years old in that city, as well as the type of healthcare facility available (pharmacy, physician's office, hospital, etc). 
+
+# Significant Results
+
+
+# Conclusions
+
