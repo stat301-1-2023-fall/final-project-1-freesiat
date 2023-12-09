@@ -1,0 +1,19 @@
+﻿Code,Meaning
+GID_0,ISO-Alpha 3 code for countries
+NAME_0,Name of the country in English
+GID_1,Unique ID across all geometries inside a specific feature at the level 0 of subdivisions
+NAME_1,Name of prefecture
+NL_NAME_1,Name of  prefecture in Japanese
+GID_2,Unique ID across all geometries inside a specific feature at the level 2 of subdivisions
+NAME_2,Name of city
+VARNAME_2,Alternative names to the city
+NL_NAME_2,Name of the third level of subdivision in Japanese
+TYPE_2,Type of administrative boundary associated to the third level of subdivision
+ENGTYPE_2,"Type of administrative boundary associated to the third level of subdivision (region, town, province, water body)"
+CC_2,Code from the original database
+HASC_2,"Index compounded by the initials of the first, second and third level of subdivision"
+year_2020_percentage,Percentage of citizens over 65 years old in that city
+amenity,Type of healthcare facility
+n,Number of healthcare facilities
+sum,Number of citizens over 65 years old within that prefecture (NAME_1)
+geometry,Multipolygon containing information drawing the boundaries for each city
