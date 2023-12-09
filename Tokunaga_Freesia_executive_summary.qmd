@@ -22,7 +22,15 @@ from: markdown+emoji
  As a global health major, I have always been interested in the distribution and accessibility of healthcare facilities. There are countless ways to quantify the accessibility of healthcare facilities, but for this project, I decided to focus on its geographical accessibility in my home country, Japan. Japan is a rapidly aging country with nearly 30% of its population aged 65 years old and above, the highest percentage in the world. However, the elderly population is distributed unequally across Japan, with a much higher number in rural regions. Despite the elderly population needing the most healthcare services, an increasingly major concern is that facilities are not as readily available in rural areas. Therefore, the aim of my project is to compare the number of healthcare facilities available in each city in Japan to the percentage of citizens over 65 years old in that city, as well as the type of healthcare facility available (pharmacy, physician's office, hospital, etc). 
 
 # Significant Results
+We see that hospitals and pharmacies are the most common type of healthcare facility in Japan, with there being a total of around 800 hospitals and 750 pharmacies across the country. When we look at the general distribution of healthcare facilities per city, we see that it is a unimodal distribution skewed to the right. Most cities in Japan have between 0~10 healthcare facilities, since the binwidth is set to 5. Almost no cities have more than 50 facilities. Finally, when looking at the distribution of healthcare facilities across the country, we see that Hokkaido has especially the most facilities, which is an interesting statistic because this prefecture does not have the largest population of those over 65 years old. 
 
+### 1. ![percentage_facility](figures/percentage_no_facility.png)
+
+### 2. ![percentage_facility_pop](figures/no_facility_vs_pop.png)
+
+### 3. ![all_jpn](figures/all_jpn.png)
+
+Finally, from this figure, we see that there is a disparity in the distribution of facilities compared to the elderly population.
 
 # Conclusions
-
+  The main conclusion drawn is that the number of healthcare facilities, regardless of its type, is heavily concentrated in metropolitan areas, where there is a smaller percentage of population over 65 years old. Metropolitan cities in Japan are the minority, with most cities having between 0~10 healthcare facilities, meaning that healthcare facilities are not equally distributed. Furthermore, there is a difference between the prefectures in the number of facilities that is not correlated to the number of citizens over 65 years old. Therefore, it would be beneficial for the Japanese government to revise its distribution of healthcare facilities to ensure that those most vulnerable are able to adequately access healthcare services, with special attention to rural areas. 

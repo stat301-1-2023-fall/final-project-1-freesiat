@@ -27,26 +27,58 @@ from: markdown+emoji
 # Introduction
    As a global health major, I have always been interested in the distribution and accessibility of healthcare facilities. There are countless ways to quantify the accessibility of healthcare facilities, but for this project, I decided to focus on its geographical accessibility in my home country, Japan. Japan is a rapidly aging country with nearly 30% of its population aged 65 years old and above, the highest percentage in the world. However, the elderly population is distributed unequally across Japan, with a much higher number in rural regions. Despite the elderly population needing the most healthcare services, an increasingly major concern is that facilities are not as readily available in rural areas. Therefore, the aim of my project is to compare the number of healthcare facilities available in each city in Japan to the percentage of citizens over 65 years old in that city, as well as the type of healthcare facility available (pharmacy, physician's office, hospital, etc). Through visualizing this data, the disparities, if any, of healthcare facilities across Japan will become apparent, and could become a starting point to understanding which cities need more of what kind of health facility.
    
-The Japanese healthcare facility data was obtained from [this website](https://data.humdata.org/dataset/japan-healthsites). The dataset is part of the **Global Healthsites Mapping Project**, an initiative to make health facility data in every country accessible to anyone across the globe. More about the project can be read [here](https://healthsites.io/). 
+  The Japanese healthcare facility data was obtained from [the Global Healthsites Mapping Project](https://data.humdata.org/dataset/japan-healthsites). The dataset is part of the **Global Healthsites Mapping Project**, an initiative to make health facility data in every country accessible to anyone across the globe. More about the project can be read [here](https://healthsites.io/).
 
-  The estimate of the percentage of elderly populations (those over 65 years old) in each Japanese city was obtained from [this website](https://www.ipss.go.jp/pp-shicyoson/j/shicyoson08/t-page.asp). This data was published by the **National Institute of Population and Social Security Research of Japan** in 2008. It must be noted that this data was only available in Japanese, so I had to translate the name of each city to English, and then create a new dataset with the English name and then I selected 2020 as the year of interest. It should also be noted that the percentage of elderly population of 2020 is an **estimate**. They estimated this number **based on data from 2005**. Unfortunately, I was unable to find any observed data of the elderly population from 2020 which was divided up by city, which is why I used this dataset.
-    The geriatric population by prefecture was found from [this website](https://www.e-stat.go.jp/stat-search/files?page=1&layout=datalist&toukei=00200524&tstat=000000090001&cycle=7&year=20220&month=0&tclass1=000001011679), which is from the official Japanese government. This data is based on 2022 census data, so it is a more accurate representation of the geriatric population distribution, but less precise since it is not divided by prefecture.
+  The estimate of the percentage of elderly populations (those over 65 years old) in each Japanese city was obtained from [the National Institute of Population and Social Security Research of Japan](https://www.ipss.go.jp/pp-shicyoson/j/shicyoson08/t-page.asp). This data was published by the **National Institute of Population and Social Security Research of Japan** in 2008. It must be noted that this data was only available in Japanese, so I had to translate the name of each city to English, and then create a new dataset with the English name and then I selected 2020 as the year of interest. It should also be noted that the percentage of elderly population of 2020 is an **estimate**. They estimated this number **based on data from 2005**. Unfortunately, I was unable to find any observed data of the elderly population from 2020 which was divided up by city, which is why I used this dataset.
+    The geriatric population by prefecture was found from [the Statistics Bureau of Japan](https://www.e-stat.go.jp/stat-search/files?page=1&layout=datalist&toukei=00200524&tstat=000000090001&cycle=7&year=20220&month=0&tclass1=000001011679), which falls under the Ministry of Economics, and is an official Japanese government website. This data is based on 2022 census data, so it is a more accurate representation of the geriatric population distribution, but less precise since it is not divided by prefecture.
   
-  Finally, the geographical data of Japan was obtained via the `getData` function in the `raster` package by specifying the dataset to be `GADM`. Then, I added in the `country = JPN` argument to specify geographic data from Japan. Finally, I set the `level` to 2 to obtain the boundaries for all of the cities and towns in Japan so that they are reflected onto the map. I then transformed the data so that it can be read in through `geom_sf` and be visualized.
-   
+  Finally, the geographical data of Japan was obtained via the `getData` function in the `raster` package by specifying the dataset to be `GADM`. 
+  
 
 # Data overview & quality
+![Summary of Data Quality](figures/missing_summary.png)
+From the data complexity analysis, we can see that there is a total of 5883 observations in this dataset. Beginning with the 1st variable, it represents the percentage of citizens aged over 65 years old in each city in the year 2020. We see that the mean percentage is 33%, and the missingness of the data would not be an issue, since it is around 7%. Moving on to the type of facility(`facility_type`), the breakdown shows us that hospitals and pharmacies are the most common healthcare facility. Next, looking at the number of facilities(`facility_count`), we see that the the mean number of facilities per city is 15, while the median is 4, which is an interesting difference to pay attention to, since this tells us that severe outliers may be driving the mean up. The missingness is around 12%, which will not heavily affect the EDA. Finally, the number of citizens aged over 65 years old per prefecture (`geriatric_count_prefecture`) has no missingness issues, and the mean number is around 1 million citizens. 
 
 
 # Explorations
 
-The plot above shows the distribution of healthcare facilities all over Japan
+## Uni-variate Analysis
+
+### 1. Types of Healthcare facilities
+![Types of Healthcare Facilities](figures/no_per_amenity.png)
+In the figure above, we see that hospitals and pharmacies are the most common type of healthcare facility in Japan, with there being a total of around 800 hospitals and 750 pharmacies across the country.
+
+
+### 2. Distribution of Types of Healthcare Facilities per City
+![Healthcare Facility Distribution](figures/amenity_density.png)
+When examining the distribution of the number of healthcare facilities per city in Japan, we see that there are very high outliers, up until 600. This 600 is an extreme number, and is most likely representing the facilities in Tokyo, since it is the world's largest city. Overall, there is little difference in distribution between the types of health facilities, and they average to about 10 facilities per city. 
+
+### 3. Distribution of Facilities per City, general
+![Healthcare Facility Distribution General](figures/distribution_facility_per_city.png)
+When we look at the general distribution of healthcare facilities per city, we see that it is a unimodal distribution skewed to the right. Most cities in Japan have between 0~10 healthcare facilities, since the binwidth is set to 5. Almost no cities have more than 50 facilities.
+
+### 4. Number of Facilities Across Prefectures
+
+![Prefecture-Wide Health Facility Distribution](figures/no_healthcare_pref.png)
+Finally, when looking at the distribution of healthcare facilities across the country, we see that Hokkaido has especially the most facilities, which is an interesting statistic because this prefecture does not have the largest population of those over 65 years old. 
+
+## Multivariate Analysis
+
+### 1. ![percentage_facility](figures/percentage_no_facility.png)
+
+### 2. ![percentage_facility_pop](figures/no_facility_vs_pop.png)
+
+In the figures above, we see that there is no significant correlation between the number of those aged over 65 years old across prefectures and the number of healthcare facilities. However, we do see evidence that there is a unimodal trend in the number of facilities, with the highest number being found in prefectures where the percentage of citizens aged 65 and older are between 25~30%. 
+
+### 3. ![all_jpn](figures/all_jpn.png)
+
+Finally, from this figure, we see that there is a disparity in the distribution of facilities compared to the elderly population.
 
 # Conclusion
+  The main conclusion drawn is that the number of healthcare facilities, regardless of its type, is heavily concentrated in metropolitan areas, where there is a smaller percentage of population over 65 years old. Metropolitan cities in Japan are the minority, with most cities having between 0~10 healthcare facilities, meaning that healthcare facilities are not equally distributed. Furthermore, there is a difference between the prefectures in the number of facilities that is not correlated to the number of citizens over 65 years old. Therefore, it would be beneficial for the Japanese government to revise its distribution of healthcare facilities to ensure that those most vulnerable are able to adequately access healthcare services, with special attention to rural areas. 
 
 # References
-https://globil.panda.org/maps/administrative-boundaries-gadm/about
+The codebook for the `pop_healthcare_facility_data.csv` dataset was created based upon the [GADM codebook](https://globil.panda.org/maps/administrative-boundaries-gadm/about).
 
-# Technical Information 
+I learned how to map geographical data from the `GADM` dataset through watching [this YouTube video](https://www.youtube.com/watch?app=desktop&v=Qbkx3LCguyg) by **Lab Time with R & Python**. I also learned how to fill in each city with a corresponding variable and its appropriate color scale through [this tutorial](https://mattherman.info/blog/point-in-poly/) by *Matt Herman*.
 
-# Extra Explorations
