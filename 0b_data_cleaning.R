@@ -3,6 +3,8 @@ library(tidyverse)
 library(skimr)
 library(readxl)
 library(raster)
+library(kableExtra)
+library(knitr)
 
 #Clean up city names
 #drop "city" from city name 
@@ -58,11 +60,14 @@ write_csv(distinct_healthcare_facilities_per_city,
           "data/distinct_healthcare_facilities_per_city.csv")
 
 #combine geriatric population data, healthcare facility data, and prefecture data
-geriatric_pop_healthcare_facility_data <- left_join(final_gp_data, distinct_healthcare_facilities_per_city) |> 
-  left_join(prefecture_gp_sum, join_by(NAME_1 == prefecture_new)) |> 
-  mutate(density = as.numeric(n / year_2020_percentage)) 
+pop_healthcare_facility_data <- left_join(final_gp_data, distinct_healthcare_facilities_per_city) |> 
+  left_join(prefecture_gp_sum, join_by(NAME_1 == prefecture_new))
+table_1 <- skimr::skim_without_charts(pop_healthcare_facility_data) |> 
+  knitr::kable()
+  
 
 #export combined df as csv file
-write_csv(geriatric_pop_healthcare_facility_data, 
-          "data/geriatric_pop_healthcare_facility_data.csv")
+write_csv(pop_healthcare_facility_data, 
+          "data/pop_healthcare_facility_data.csv")
+
 
