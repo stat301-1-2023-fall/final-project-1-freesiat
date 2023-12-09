@@ -1,11 +1,21 @@
+# Data Cleaning
+library(tidyverse)
+library(skimr)
+library(readxl)
+library(raster)
+
+#Clean up city names
+#drop "city" from city name 
+gp_new <- as.data.frame(geriatric_population) |> 
+  mutate(city_name = word(city, 1)) |> 
+  dplyr::select(year_2020_percentage, city_name) 
+
 #clean up names of Japanese cities so that all accents are removed
 jpn_df$NAME_2 <- iconv(jpn_df$NAME_2, 'utf-8', 'ascii', sub = '')
 
 #filter out all cities in the elderly population dataset that exist in 'jpn_df' and set crs
 final_gp_data <- jpn_df |>
   left_join(gp_new, by = join_by(NAME_2 == city_name))
-
-# skimr::skim_without_charts(final_gp_data)
 
 #prepare final_gp_data for analysis
 gp_data_sf <- final_gp_data |> 
