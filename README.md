@@ -18,10 +18,10 @@ Brief Overview of Repo
 - `3_polishing_figures_tables.R`: Polishing figures and tables from univariate and multivariate analysis for final report and summary.
 
 ### HTML and qmd Files
-- `Tokunaga_Freesia_executive_summary.qmd`: 
-- `Tokunaga_Freesia_executive_summary.html`: 
+- `Tokunaga_Freesia_executive_summary.qmd`: Final executive summary, qmd format.
+- `Tokunaga_Freesia_executive_summary.html`: Final executive summary, html format.
 
-- `Tokunaga_Freesia_final_report.qmd`: 
-- `Tokunaga_Freesia_executive_final_report.html`: 
+- `Tokunaga_Freesia_final_report.qmd`: Final report, qmd format.
+- `Tokunaga_Freesia_executive_final_report.html`: Final executive summary, html format.
 
 
