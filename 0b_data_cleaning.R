@@ -13,13 +13,22 @@ gp_new <- as.data.frame(geriatric_population) |>
 #clean up names of Japanese cities so that all accents are removed
 jpn_df$NAME_2 <- iconv(jpn_df$NAME_2, 'utf-8', 'ascii', sub = '')
 
-#filter out all cities in the elderly population dataset that exist in 'jpn_df' and set crs
+#filter out all cities in the elderly population dataset that exist in 'jpn_df'
 final_gp_data <- jpn_df |>
   left_join(gp_new, by = join_by(NAME_2 == city_name))
 
-#prepare final_gp_data for analysis
+#prepare final_gp_data for analysis by removing all rows that had missing values
 gp_data_sf <- final_gp_data |> 
   filter(!is.na(year_2020_percentage))
+
+#cleaning up prefecture-based geriatric population data
+colnames(prefecture_gp)[1] <- "prefecture"
+
+#finding total geriatric population by adding together the columns
+prefecture_gp_sum <- prefecture_gp |> 
+  mutate(sum = rowSums(across(where(is.numeric)), na.rm=TRUE),
+         prefecture_new = gsub("-.*","", prefecture_gp$prefecture)) |> 
+  dplyr::select(prefecture_new, sum)
 
 #convert healthsites into sf object
 jpn_hlthsites_sf <- japan_healthsites |> 
