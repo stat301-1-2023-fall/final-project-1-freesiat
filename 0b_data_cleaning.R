@@ -24,11 +24,12 @@ gp_data_sf <- final_gp_data |>
 #cleaning up prefecture-based geriatric population data
 colnames(prefecture_gp)[1] <- "prefecture"
 
-#finding total geriatric population by adding together the columns
+#finding total geriatric population by adding together the columns, and then multiplying by 1000 since the data is in 1000's of people 
 prefecture_gp_sum <- prefecture_gp |> 
-  mutate(sum = rowSums(across(where(is.numeric)), na.rm=TRUE),
+  mutate(sum = rowSums(across(where(is.numeric)), na.rm=TRUE)*1000,
          prefecture_new = gsub("-.*","", prefecture_gp$prefecture)) |> 
   dplyr::select(prefecture_new, sum)
+
 
 #convert healthsites into sf object
 jpn_hlthsites_sf <- japan_healthsites |> 
@@ -46,9 +47,22 @@ joint_data <- st_join(jpn_hlthsites_sf, final_gp_data, join = st_within) |>
   distinct(geometry, .keep_all = TRUE) |> 
   filter(!is.na(year_2020_percentage))
 
+#df showing the number of healthcare facilities per city
 healthcare_facilities_per_city <- count(as_tibble(joint_data), NAME_2) 
+write_csv(healthcare_facilities_per_city, 
+          "data/healthcare_facilities_per_city.csv")
 
+#df showing the number of distinct healthcare facilities per city
 distinct_healthcare_facilities_per_city <- count(as_tibble(joint_data), NAME_2, amenity)
+write_csv(distinct_healthcare_facilities_per_city, 
+          "data/distinct_healthcare_facilities_per_city.csv")
 
-new_data <- left_join(final_gp_data, healthcare_facilities_per_city) |> 
-  mutate(density = as.numeric(n / year_2020_percentage))
+#combine geriatric population data, healthcare facility data, and prefecture data
+geriatric_pop_healthcare_facility_data <- left_join(final_gp_data, distinct_healthcare_facilities_per_city) |> 
+  left_join(prefecture_gp_sum, join_by(NAME_1 == prefecture_new)) |> 
+  mutate(density = as.numeric(n / year_2020_percentage)) 
+
+#export combined df as csv file
+write_csv(geriatric_pop_healthcare_facility_data, 
+          "data/geriatric_pop_healthcare_facility_data.csv")
+
