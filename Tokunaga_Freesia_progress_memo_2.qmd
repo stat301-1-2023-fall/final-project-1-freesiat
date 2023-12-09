@@ -140,22 +140,16 @@ new_data <- left_join(final_gp_data, healthcare_facilities_per_city) |>
   First, I used `left_join` to combine the geriatric population data and the map data together, which eliminated data for all cities that weren't present in the map dataset. Then, I removed all rows that contained missing values for the geriatric population percentage. Then, I converted the healthcare sites data into an sf object so that it can be visualized onto the map. Finally, I joined the healthcare sites data to the larger dataset by matching the city that the healthcare site belonged to by passing in a function that checked the given coordinates and matched them to the appropriate multipolygon object present in the maps dataset. 
 
 ## EDA
-```{r}
-
-
-```
-
 
 ```{r echo = FALSE}
 #all of Japan
 all_jpn <- ggplot() +
   geom_sf(data = new_data, aes(group = NAME_2, fill = density)) +
   theme_void() 
-```
 
-```{r}
 all_jpn
 ```
+
 The plot above shows the distribution of healthcare facilities all over Japan
 
 ```{r}
