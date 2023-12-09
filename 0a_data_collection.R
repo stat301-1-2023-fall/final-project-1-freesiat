@@ -10,7 +10,7 @@ library(raster)
 japan_healthsites <- read_csv("data/raw_data/japan.csv") |> 
   dplyr::select(X, Y, amenity)
 
-#percentage of citizens over 65 years old in every city in Japan
+#percentage of citizens over 65 years old in every city in Japan in 2020
 geriatric_population <- read_excel("data/raw_data/geriatric_city.xlsx")
 janitor::clean_names(geriatric_population)  
 

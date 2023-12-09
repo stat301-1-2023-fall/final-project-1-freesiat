@@ -6,7 +6,7 @@ This file contains all of the raw data used in the EDA.
 
 2. `geriatric_city.xlsx`: The `kekkahyo-3-3-48.xls` data translated to English by myself, and selected data for the year 2020
 
-3. `japan.csv`: Data containing the location information for every healthcare facility in Japan, as well as qualitative information such as the type of facility, and the medical field specialty if applicable 
+3. `japan.csv`: Data containing the location information for every healthcare facility in Japan, as well as qualitative information such as the type of facility, and the medical field specialty if applicable. Obtained from [the Global Healthsites Mapping Project](https://data.humdata.org/dataset/japan-healthsites), an initiative to make health facility data in every country accessible to anyone across the globe. 
 
 4. `prefecture_pop.xlsx`: Original file in Japanese downloaded from [the Statistics Bureau of Japan](https://www.stat.go.jp/data/jinsui/2022np/index.html), containing census data regarding the number of citizens in each of the 47 prefectures, divided by 5 year age increments.
 

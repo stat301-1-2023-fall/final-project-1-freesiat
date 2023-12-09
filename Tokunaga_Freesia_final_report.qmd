@@ -37,7 +37,10 @@ The Japanese healthcare facility data was obtained from [this website](https://d
 
 # Data overview & quality
 
+
 # Explorations
+
+The plot above shows the distribution of healthcare facilities all over Japan
 
 # Conclusion
 
